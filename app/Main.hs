@@ -36,7 +36,7 @@ main = do
     _ <- getLine
     randomRIO (1,10) >>= \r -> threadDelay (r * 100000)
     c <- takeMVar b 
-    putStrLn $ "The winner is: " ++ c
+    putStrLn $ "The winner is: " ++ (show c)
     
 
 data Coin = Head | Tail deriving (Show, Eq)
@@ -45,13 +45,13 @@ coinFlip = do
     r <- randomIO :: IO Bool
     return $ if r then Head else Tail
 
-customerthreads :: Customer -> MVar String -> MVar Coin -> IO ()    
+customerthreads :: Customer -> MVar (String, Customer) -> MVar Coin -> IO ()    
 customerthreads cust b box = do 
     c1 <- coinFlip
     c2 <- takeMVar box
     putStrLn $ (show cust) ++ " -- got " ++ (show c1)
     if c1 == c2 then
-        putMVar b ("Process " ++ (show cust) ++ " wins!")
+        putMVar b ((" We've got a winner: "), cust)
     else do
         putStrLn $ " -- putting coin back in the box "
         putMVar box c2
