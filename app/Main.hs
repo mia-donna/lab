@@ -144,7 +144,7 @@ customerthreads cust b box = do
 -- Each customer thread should behave as follows: at random time intervals, the thread should select one of the other customers at random, 
 -- and transfer a random amount of money (between £10 and £50)  into their account. 
 --The amount transferred should not be more than what that customer has available in their account balance (account balances should not be negative).
-
+-- try to move both the checks to the one thread
 main :: IO ()
 main = {-forever $-} do
        coin <- coinFlip
@@ -157,7 +157,7 @@ main = {-forever $-} do
        let c4 = Customer {name = "C4", balance = 20, account = Four}
        let c5 = Customer {name = "C5", balance = 20, account = Five}
        let c6 = Customer {name = "C6", balance = 20, account = Six}
-       let c7 = Customer {name = "C3", balance = 20, account = Seven}
+       let c7 = Customer {name = "C7", balance = 20, account = Seven}
        let c8 = Customer {name = "C8", balance = 20, account= Eight}
        let c9 = Customer {name = "C9", balance = 20, account = Nine}
        let c10 = Customer {name = "C10", balance = 20, account = Ten}
@@ -167,28 +167,30 @@ main = {-forever $-} do
        putStrLn $ "10 customer threads being created."
        randomRIO (1,10) >>= \r -> threadDelay (r * 100000)
        mapM_ forkIO [customerthreads c1 b box, customerthreads c2 b box, customerthreads c3 b box, customerthreads c4 b box, customerthreads c5 b box, customerthreads c6 b box, customerthreads c7 b box, customerthreads c8 b box, customerthreads c9 b box, customerthreads c10 b box]
-       putStrLn "Press Return to show the results."
-       _ <- getLine
-       randomRIO (1,10) >>= \r -> threadDelay (r * 100000)
+       --putStrLn "Press Return to show the results_b."
+       --_ <- getLine
+       --U randomRIO (1,10) >>= \r -> threadDelay (r * 100000)
        c <- takeMVar b 
        putStrLn $ "The payee is: " ++ (show c)
     -- run again to find second winner
-       putStrLn $ " -- putting coin back in the box"
+       --U putStrLn $ " -- putting coin back in the box_b"
        putMVar b c
-       putStrLn "Press Return to find the recipient."
-       _ <- getLine
-       box2 <- newMVar coin
-       b2 <- newEmptyMVar
-       mapM_  forkIO [customerthreads c1 b2 box2, customerthreads c2 b2 box2, customerthreads c3 b2 box2]
-       randomRIO (1,10) >>= \r -> threadDelay (r * 100000)
-       putStrLn "Press Return to show the results."
-       _ <- getLine
-       d <- takeMVar b2
-       amount <- randomN
-       putStrLn $ "The recipient is: " ++ (show d) ++ "The payee is: " ++ (show c) ++ " and the random amount is: " ++ (show amount)
-       (c, d) <- transfer c d amount
-       putStrLn $ "****UPDATED*****The recipient is: " ++ (show d) ++ "The payee is: " ++ (show c)
-       
+       --putStrLn "Press Return to find the recipient."
+       --U _ <- getLine
+       --U box2 <- newMVar coin
+       --U b2 <- newEmptyMVar
+       --U mapM_  forkIO [customerthreads c1 b2 box2, customerthreads c2 b2 box2, customerthreads c3 b2 box2]
+       --U randomRIO (1,10) >>= \r -> threadDelay (r * 100000)
+       --putStrLn "Press Return to show the results."
+       --U _ <- getLine
+
+       --U d <- takeMVar b2
+       --U putStrLn $ "The recipient is: " ++ (show d)
+       --  amount <- randomN
+       --U putStrLn $ "The recipient is: " ++ (show d) ++ "The payee is: " ++ (show c) ++ " and the random amount is: " ++ (show amount)
+       --(c, d) <- transfer c d amount
+       --putStrLn $ "****UPDATED*****The recipient is: " ++ (show d) ++ "The payee is: " ++ (show c)
+       putStrLn $ "test"
     
     {-if (d balance) == (c balance) then
         putStrLn $ "wow"
@@ -208,16 +210,17 @@ customerthreads cust b box = do
     c2 <- takeMVar box
     putStrLn $ (show cust) ++ " -- got " ++ (show c1)
     if c1 == c2 then do
-        putStrLn "Press Return to show the results."
+        putStrLn "Press Return to show the results_a."
         _ <- getLine
         putMVar b (cust)
         putStrLn $ " -- test for next customer -- putting coin back in the box"
         putMVar box c2
-        randomRIO (1,10) >>= \r -> threadDelay (r * 100000)
-        customerthreads cust b box
-        if c1 == c2 
-            then putStrLn $ "we got two values" 
-            else putStrLn $ "nope"
+        putStrLn $ " -- checking for the next customer that matched random coin"
+        c1 <- takeMVar box
+        putStrLn $ (show cust) ++ " -- also got! " ++ (show c1)
+        --if c1 == c2 
+            --then putStrLn $ "we got two values" 
+            --else putStrLn $ "nope"
     else do
         putStrLn $ " -- putting coin back in the box "
         putMVar box c2
