@@ -39,11 +39,11 @@ main = do
     -- run again to find second winner?
     putStrLn $ " -- putting winner coin back in the box"
     putMVar b c
-    putStrLn "Press Return to flip coin again."
+    putStrLn "Press Return to find the second winner."
     _ <- getLine
-    coin2 <- coinFlip
-    putStrLn $ "Random coin is: " ++ (show coin2)
-    putStrLn $ " -- creating a new coin box and flipping the coin again"
+    --coin2 <- coinFlip
+    --putStrLn $ "Random coin is: " ++ (show coin2)
+    --putStrLn $ " -- creating a new coin box and flipping the coin again"
     box2 <- newMVar coin
     -- **
     b2 <- newEmptyMVar
