@@ -61,8 +61,9 @@ main = do
     putStrLn "Press Return to show the results."
     _ <- getLine
     d <- takeMVar b2
-    putStrLn $ "The recipient is: " ++ (show d) ++ "The payee is: " ++ (show c)
-    (c, d) <- transfer c d 10
+    amount <- randomN
+    putStrLn $ "The recipient is: " ++ (show d) ++ "The payee is: " ++ (show c) ++ " and the random amount is: " ++ (show amount)
+    (c, d) <- transfer c d amount
     putStrLn $ "****UPDATED*****The recipient is: " ++ (show d) ++ "The payee is: " ++ (show c)
 
     {-if (d balance) == (c balance) then
@@ -95,6 +96,13 @@ transfer from to amount
   -- | amount <= 0 = return (from, to)
   | balance from < amount = return (from, to)
   | otherwise = return ((from { balance =  ((balance  from) - amount)}),(to { balance  =  ((balance  to) + amount)}))        
+
+randomN :: IO Int 
+randomN = do
+    r <- randomRIO (10, 50)
+    return r
+
+
 
 -- This function creates threads with the MVar holding two things 
 {-customerthreads :: Customer -> MVar (String, Customer) -> MVar Coin -> IO ()    
