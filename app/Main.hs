@@ -30,12 +30,21 @@ main = do
     let c3 = Customer {name = "C3", balance = 100, account = Three}
 
     b <- newEmptyMVar
-    var <- newMVar []
     mapM_  forkIO [customerthreads c1 b box, customerthreads c2 b box, customerthreads c3 b box]
     putStrLn "Press Return to show the results."
     _ <- getLine
     randomRIO (1,10) >>= \r -> threadDelay (r * 100000)
     c <- takeMVar b 
+    putStrLn $ "The winner is: " ++ (show c)
+    -- run again to find second winner?
+    putStrLn $ " -- putting winner coin back in the box"
+    putMVar b c
+    x <- newEmptyMVar
+    mapM_  forkIO [customerthreads c1 b box, customerthreads c2 b box, customerthreads c3 b box]
+    putStrLn "Press Return to show the results."
+    _ <- getLine
+    randomRIO (1,10) >>= \r -> threadDelay (r * 100000)
+    c <- takeMVar b
     putStrLn $ "The winner is: " ++ (show c)
     
 
