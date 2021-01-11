@@ -171,7 +171,11 @@ main = {-forever $-} do
        --_ <- getLine
        --U randomRIO (1,10) >>= \r -> threadDelay (r * 100000)
        c <- takeMVar b 
+       --h <- newEmptyMVar
        putStrLn $ "The payee is: " ++ (show c)
+       ---RU h <- newMVar coin
+       --g <- takeMVar h
+       -- putStrLn $ "The rec is: " ++ (show g)
     -- run again to find second winner
        --U putStrLn $ " -- putting coin back in the box_b"
        putMVar b c
@@ -210,17 +214,19 @@ customerthreads cust b box = do
     c2 <- takeMVar box
     putStrLn $ (show cust) ++ " -- got " ++ (show c1)
     if c1 == c2 then do
-        putStrLn "Press Return to show the results_a."
+        putStrLn "Match! Press return"
         _ <- getLine
         putMVar b (cust)
         putStrLn $ " -- test for next customer -- putting coin back in the box"
         putMVar box c2
         putStrLn $ " -- checking for the next customer that matched random coin"
-        c1 <- takeMVar box
-        putStrLn $ (show cust) ++ " -- also got! " ++ (show c1)
+        c2 <- takeMVar box
+        customerthreads cust b box
+        putStrLn $ (show cust) ++ " -- also got! " ++ (show c2)
         --if c1 == c2 
             --then putStrLn $ "we got two values" 
             --else putStrLn $ "nope"
+
     else do
         putStrLn $ " -- putting coin back in the box "
         putMVar box c2
