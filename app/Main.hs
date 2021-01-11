@@ -7,6 +7,7 @@ import Data.Map (Map)
 import qualified Data.Map as Map
 import Control.Concurrent
 import System.Random
+import Control.Monad ( forever )
 import Prelude hiding (lookup)
 
 -- <<types
@@ -23,48 +24,49 @@ type Balance = Int
 -- 11.01.21 Monday's coinflip with:
 -- Random thread delays + getline to process results
 main :: IO ()
-main = do
-    coin <- coinFlip
-    putStrLn $ "Random coin is: " ++ (show coin)
-    box <- newMVar coin
+main = forever $ do
+       coin <- coinFlip
+       putStrLn $ "Random coin is: " ++ (show coin)
+       box <- newMVar coin
     
-    let c1 = Customer {name = "C1", balance = 100, account = One}
-    let c2 = Customer {name = "C2", balance = 100, account = Two} 
-    let c3 = Customer {name = "C3", balance = 100, account = Three}
-    let c4 = Customer {name = "C4", balance = 20, account = Four}
-    let c5 = Customer {name = "C5", balance = 20, account = Five}
-    let c6 = Customer {name = "C6", balance = 20, account = Six}
-    let c7 = Customer {name = "C3", balance = 20, account = Seven}
-    let c8 = Customer {name = "C8", balance = 20, account= Eight}
-    let c9 = Customer {name = "C9", balance = 20, account = Nine}
-    let c10 = Customer {name = "C10", balance = 20, account = Ten}
-    putStrLn $ "10 customers created."
+       let c1 = Customer {name = "C1", balance = 100, account = One}
+       let c2 = Customer {name = "C2", balance = 100, account = Two} 
+       let c3 = Customer {name = "C3", balance = 100, account = Three}
+       let c4 = Customer {name = "C4", balance = 20, account = Four}
+       let c5 = Customer {name = "C5", balance = 20, account = Five}
+       let c6 = Customer {name = "C6", balance = 20, account = Six}
+       let c7 = Customer {name = "C3", balance = 20, account = Seven}
+       let c8 = Customer {name = "C8", balance = 20, account= Eight}
+       let c9 = Customer {name = "C9", balance = 20, account = Nine}
+       let c10 = Customer {name = "C10", balance = 20, account = Ten}
+       putStrLn $ "10 customers created."
 
-    b <- newEmptyMVar
-    putStrLn $ "10 customer threads being created."
-    randomRIO (1,10) >>= \r -> threadDelay (r * 100000)
-    mapM_ forkIO [customerthreads c1 b box, customerthreads c2 b box, customerthreads c3 b box, customerthreads c4 b box, customerthreads c5 b box, customerthreads c6 b box, customerthreads c7 b box, customerthreads c8 b box, customerthreads c9 b box, customerthreads c10 b box]
-    putStrLn "Press Return to show the results."
-    _ <- getLine
-    randomRIO (1,10) >>= \r -> threadDelay (r * 100000)
-    c <- takeMVar b 
-    putStrLn $ "The payee is: " ++ (show c)
+       b <- newEmptyMVar
+       putStrLn $ "10 customer threads being created."
+       randomRIO (1,10) >>= \r -> threadDelay (r * 100000)
+       mapM_ forkIO [customerthreads c1 b box, customerthreads c2 b box, customerthreads c3 b box, customerthreads c4 b box, customerthreads c5 b box, customerthreads c6 b box, customerthreads c7 b box, customerthreads c8 b box, customerthreads c9 b box, customerthreads c10 b box]
+       putStrLn "Press Return to show the results."
+       _ <- getLine
+       randomRIO (1,10) >>= \r -> threadDelay (r * 100000)
+       c <- takeMVar b 
+       putStrLn $ "The payee is: " ++ (show c)
     -- run again to find second winner
-    putStrLn $ " -- putting coin back in the box"
-    putMVar b c
-    putStrLn "Press Return to find the recipient."
-    _ <- getLine
-    box2 <- newMVar coin
-    b2 <- newEmptyMVar
-    mapM_  forkIO [customerthreads c1 b2 box2, customerthreads c2 b2 box2, customerthreads c3 b2 box2]
-    randomRIO (1,10) >>= \r -> threadDelay (r * 100000)
-    putStrLn "Press Return to show the results."
-    _ <- getLine
-    d <- takeMVar b2
-    amount <- randomN
-    putStrLn $ "The recipient is: " ++ (show d) ++ "The payee is: " ++ (show c) ++ " and the random amount is: " ++ (show amount)
-    (c, d) <- transfer c d amount
-    putStrLn $ "****UPDATED*****The recipient is: " ++ (show d) ++ "The payee is: " ++ (show c)
+       putStrLn $ " -- putting coin back in the box"
+       putMVar b c
+       putStrLn "Press Return to find the recipient."
+       _ <- getLine
+       box2 <- newMVar coin
+       b2 <- newEmptyMVar
+       mapM_  forkIO [customerthreads c1 b2 box2, customerthreads c2 b2 box2, customerthreads c3 b2 box2]
+       randomRIO (1,10) >>= \r -> threadDelay (r * 100000)
+       putStrLn "Press Return to show the results."
+       _ <- getLine
+       d <- takeMVar b2
+       amount <- randomN
+       putStrLn $ "The recipient is: " ++ (show d) ++ "The payee is: " ++ (show c) ++ " and the random amount is: " ++ (show amount)
+       (c, d) <- transfer c d amount
+       putStrLn $ "****UPDATED*****The recipient is: " ++ (show d) ++ "The payee is: " ++ (show c)
+                               
 
     {-if (d balance) == (c balance) then
         putStrLn $ "wow"
@@ -126,4 +128,9 @@ customerthreads cust b box = do
 -- then test running the function        
 
 --Still can't
--- access Customer data points
+-- access Customer data points using record syntax
+
+--Still need to
+-- ensure process fails if two of the same customers are chosen
+    -- run 100 times (?)
+        -- print out all the final accounts
