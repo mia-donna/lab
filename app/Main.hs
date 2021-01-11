@@ -39,11 +39,15 @@ main = do
     -- run again to find second winner?
     putStrLn $ " -- putting winner coin back in the box"
     putMVar b c
-    x <- newEmptyMVar
-    mapM_  forkIO [customerthreads c1 b box, customerthreads c2 b box, customerthreads c3 b box]
+    coin2 <- coinFlip
+    putStrLn $ "Random coin is: " ++ (show coin2)
+    putStrLn $ " -- creating a new coin box and flipping the coin again"
+    box2 <- newMVar coin
+    -- b <- newMVar ()
+    mapM_  forkIO [customerthreads c1 b box2, customerthreads c2 b box2, customerthreads c3 b box2]
+    randomRIO (1,10) >>= \r -> threadDelay (r * 100000)
     putStrLn "Press Return to show the results."
     _ <- getLine
-    randomRIO (1,10) >>= \r -> threadDelay (r * 100000)
     c <- takeMVar b
     putStrLn $ "The winner is: " ++ (show c)
     
@@ -59,7 +63,7 @@ customerthreads cust b box = do
     c1 <- coinFlip
     c2 <- takeMVar box
     putStrLn $ (show cust) ++ " -- got " ++ (show c1)
-    if c1 == c2 then
+    if c1 == c2 then do
         putMVar b ((" We've got a winner: "), cust)
     else do
         putStrLn $ " -- putting coin back in the box "
