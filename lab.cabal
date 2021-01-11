@@ -1,0 +1,63 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.33.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 71b467100cba027526928c3652040c357a66115bede51ef9fe1cbfb58328ba02
+
+name:           lab
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/githubuser/lab#readme>
+homepage:       https://github.com/githubuser/lab#readme
+bug-reports:    https://github.com/githubuser/lab/issues
+author:         Author name here
+maintainer:     example@example.com
+copyright:      2021 Author name here
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    ChangeLog.md
+
+source-repository head
+  type: git
+  location: https://github.com/githubuser/lab
+
+library
+  exposed-modules:
+      Lib
+  other-modules:
+      Paths_lab
+  hs-source-dirs:
+      src
+  build-depends:
+      base >=4.7 && <5
+  default-language: Haskell2010
+
+executable lab-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_lab
+  hs-source-dirs:
+      app
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , lab
+    , random
+  default-language: Haskell2010
+
+test-suite lab-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_lab
+  hs-source-dirs:
+      test
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , lab
+  default-language: Haskell2010
