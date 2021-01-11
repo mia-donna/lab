@@ -1,9 +1,24 @@
 module Main where
 
+import Data.Map (Map)
+import qualified Data.Map as Map
 import Control.Concurrent
 import System.Random
+import Prelude hiding (lookup)
 
+-- <<types
+data Customers = Customers {
+  name :: Name,
+  accountNumber :: AccountNumber,
+  balance :: Balance
+} deriving (Show, Eq)
 
+type Name        = String
+type AccountNumber = String
+type Balance = Int
+
+-- 11.01.21 Monday's coinflip with:
+-- Random thread delays + getline to process results
 main :: IO ()
 main = do
     coin <- coinFlip
@@ -18,8 +33,6 @@ main = do
     c <- takeMVar b 
     putStrLn $ "The winner is: " ++ c
     
-
-   
 
 data Coin = Head | Tail deriving (Show, Eq)
 coinFlip :: IO Coin
@@ -40,3 +53,5 @@ process a b box = do
         randomRIO (1,10) >>= \r -> threadDelay (r * 100000)
         process a b box
 
+
+        
