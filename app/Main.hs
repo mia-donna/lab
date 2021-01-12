@@ -24,7 +24,9 @@ type Balance = Int
 
 
 -- 11.01.21 Monday's coinflip with:
--- Random thread delays + getline to process results
+-- Has random thread delays + getline to process results
+-- Has transfer customer -> customer last action
+-- Has function application for customer data
 main :: IO ()
 main = {-forever $-} do 
        coin <- coinFlip
@@ -67,15 +69,23 @@ main = {-forever $-} do
        amount <- randomN
        putStrLn $ "The recipient is: " ++ (show d) ++ "The payee is: " ++ (show c) ++ " and the random amount is: " ++ (show amount)
        if d /= c then do
-            let print_balance = print . balance 
-            let pd = print_balance d
-            let pc = print_balance c 
+            -- accessing customer records
+            let print_account = print . account 
+            let pd = print_account d
+            let pc = print_account c 
             pd -- recipient
             pc -- payee
-            --if pc == pd then 
+           -- if pc == pd then 
+                --putStrLn "Wow! Matching customers"
             (c, d) <- transfer c d amount
             putStrLn $ "****UPDATED*****The recipient is: " ++ (show d) ++ "The payee is: " ++ (show c)
             else 
+                -- accessing customer records
+                {-let print_account = print . account
+                let pd = print_account d
+                let pc = print_account c
+                pd
+                pc-}
                 putStrLn $ "no transfer this time as they are the same account" 
            
         {-if d (balance d) == c (balance c) then 
