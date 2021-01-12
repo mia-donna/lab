@@ -1,5 +1,6 @@
 {-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE BlockArguments #-} 
 
 module Main where
 
@@ -7,7 +8,7 @@ import Data.Map (Map)
 import qualified Data.Map as Map
 import Control.Concurrent
 import System.Random
-import Control.Monad ( forever )
+import Control.Monad ( forever, replicateM )
 import Prelude hiding (lookup)
 -- **
 import System.Exit
@@ -15,11 +16,7 @@ import Data.Char (toLower)
 import System.IO
 
 -- <<types
-data Customer = Customer {
-  name :: Name,
-  account :: Account,
-  balance :: Balance
-} deriving (Show, Eq)
+data Customer = Customer { name :: Name, account :: Account, balance :: Balance } deriving (Show, Eq)
 
 type Name    = String
 data Account = One | Two | Three | Four | Five | Six | Seven | Eight | Nine | Ten deriving (Show, Eq)
@@ -29,7 +26,7 @@ type Balance = Int
 -- 11.01.21 Monday's coinflip with:
 -- Random thread delays + getline to process results
 main :: IO ()
-main = {-forever $-} do
+main = {-forever $-} do 
        coin <- coinFlip
        putStrLn $ "Random coin is: " ++ (show coin)
        box <- newMVar coin
@@ -55,7 +52,7 @@ main = {-forever $-} do
        randomRIO (1,10) >>= \r -> threadDelay (r * 100000)
        c <- takeMVar b 
        putStrLn $ "The payee is: " ++ (show c)
-    -- run again to find second winner
+    -- run again to find recipient
        putStrLn $ " -- putting coin back in the box"
        putMVar b c
        putStrLn "Press Return to find the recipient."
@@ -69,15 +66,22 @@ main = {-forever $-} do
        d <- takeMVar b2
        amount <- randomN
        putStrLn $ "The recipient is: " ++ (show d) ++ "The payee is: " ++ (show c) ++ " and the random amount is: " ++ (show amount)
-       
-       (c, d) <- transfer c d amount
-       putStrLn $ "****UPDATED*****The recipient is: " ++ (show d) ++ "The payee is: " ++ (show c)
-       
-    
-    {-if (d balance) == (c balance) then
-        putStrLn $ "wow"
-        else 
-            putStrLn "nope"-}
+       if d /= c then do
+            let print_balance = print . balance 
+            let pd = print_balance d
+            let pc = print_balance c 
+            pd -- recipient
+            pc -- payee
+            --if pc == pd then 
+            (c, d) <- transfer c d amount
+            putStrLn $ "****UPDATED*****The recipient is: " ++ (show d) ++ "The payee is: " ++ (show c)
+            else 
+                putStrLn $ "no transfer this time as they are the same account" 
+           
+        {-if d (balance d) == c (balance c) then 
+                putStrLn $ "same customer, same balance!"
+                else 
+                    putStrLn "nope"-}
 
 data Coin = Head | Tail deriving (Show, Eq)
 coinFlip :: IO Coin
